@@ -56,7 +56,7 @@ userSchema.methods.generateAuthToken = function () {
 };
 
 //User model
-const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 //validate the user inputs
 
 function validateRegistereUser(user) {
