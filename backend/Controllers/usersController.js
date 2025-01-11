@@ -51,12 +51,23 @@ const getUsersContCtrl = asyncHandler(async (req, res) => {
 });
 
 
+//Profile Photo Upload
+const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
+ if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  res.status(200).json({ message: 'Profile photo uploaded successfully' });
+
+});
+
 
 module.exports = {
   getAllUsersCtrl,
   getUserCtrl,
   updateUserCtrl,
-  getUsersContCtrl
+  getUsersContCtrl,
+  profilePhotoUploadCtrl
  
 };
 
