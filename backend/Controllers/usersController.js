@@ -95,16 +95,35 @@ const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
   fs.unlinkSync(imagePath);
 });
 
+/**
+ * @desc   Delete user by ID
+ * @route  DELETE /api/users/profile/:id
+ * @access Private
+ */
+const deleteUserCtrl = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  // Delete profile photo from Cloudinary
+  
+    await cloudinaryDeleteImage(user.profilePhoto.public_id);
+  
+
+  // Delete the user
+  await User.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({ message: 'Your account has been deleted' });
+});
+
 module.exports = {
   getAllUsersCtrl,
   getUserCtrl,
   updateUserCtrl,
   getUsersContCtrl,
-  profilePhotoUploadCtrl
- 
+  profilePhotoUploadCtrl,
+  deleteUserCtrl,
 };
-
-
-
 
 
