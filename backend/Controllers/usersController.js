@@ -1,6 +1,9 @@
 const asyncHandler = require('express-async-handler');
 const { User, validateUpdateUser } = require('../models/users');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const { cloudinaryUploadImage, cloudinaryDeleteImage}= require('../utils/cloudinary');
+const fs = require('fs');
 
 /**
  * @desc   Get all users
@@ -23,6 +26,7 @@ const getUserCtrl = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
   res.json(user);
+
 });
 
 // Update user
@@ -51,16 +55,45 @@ const getUsersContCtrl = asyncHandler(async (req, res) => {
 });
 
 
-//Profile Photo Upload
+/**
+ * @desc   Profile Photo Upload
+ * @route  POST /api/users/profile/profile-photo-upload
+ * @access Private
+ */
 const profilePhotoUploadCtrl = asyncHandler(async (req, res) => {
- if (!req.file) {
+  if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
+  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+  const result = await cloudinaryUploadImage(imagePath);
+  console.log(result);
 
-  res.status(200).json({ message: 'Profile photo uploaded successfully' });
+  // Get user from DB
+  const user = await User.findById(req.user.id); // Assuming req.user.id contains the user ID
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
 
+  // Delete old profile photo if it exists
+  if (user.profilePhoto && user.profilePhoto.public_id) {
+    await cloudinaryDeleteImage(user.profilePhoto.public_id);
+  }
+
+  // Change profile photo
+  user.profilePhoto = {
+    url: result.secure_url,
+    public_id: result.public_id,
+  };
+  await user.save();
+
+  res.status(200).json({
+    message: 'Profile photo uploaded successfully',
+    profilePhoto: { url: result.secure_url, public_id: result.public_id },
+  });
+
+  // Remove image from server
+  fs.unlinkSync(imagePath);
 });
-
 
 module.exports = {
   getAllUsersCtrl,

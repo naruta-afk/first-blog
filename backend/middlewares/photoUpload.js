@@ -1,35 +1,29 @@
-const path = require('path');
 const multer = require('multer');
-
-
+const path = require('path');
 
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, path.join(__dirname, '../images'));
-    },
-    filename: function (req, file, cb) {
-     if(file){
-        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
-     }else{
-        cb(null, false);
-     }
-    }
-  });
+  destination: (req, file, cb) => {
+    cb(null, 'images/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
 
+const upload = multer({
+  storage,
+  limits: { fileSize: 1024 * 1024 }, // 1MB file size limit
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
 
-  //photo upload middleware
-  const upload = multer({ 
-   storage: storage,
-   fileFilter: function (req, file, cb) {
-    if (file.mimetype.startsWith("image") ) {
-      cb(null, true);
+    if (mimetype && extname) {
+      return cb(null, true);
     } else {
-      cb({
-        message: "Unsupported file format"}, false);
+      cb(new Error('Only images are allowed'));
     }
   },
-  limits: {
-    fileSize: 1024 * 1024 
-  }
 });
-  module.exports = upload;
+
+module.exports = upload;
