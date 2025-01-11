@@ -29,4 +29,16 @@ function verifyTokenAndAdmin(req, res, next) {
     });
 }
 
-module.exports = {verifyToken , verifyTokenAndAdmin};
+
+// verify token & user
+function verifyTokenAndUser(req, res, next) {
+    verifyToken(req, res, () => {
+        if(req.user.id === req.params.id ){
+            next();
+        }else{
+            return res.status(403).json({message:"Access denied"});
+        }
+    });
+}
+
+module.exports = {verifyToken , verifyTokenAndAdmin, verifyTokenAndUser};
