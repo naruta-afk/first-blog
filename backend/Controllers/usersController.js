@@ -1,5 +1,5 @@
 const asyncHandler = require('express-async-handler');
-const { User, validateUpdateUser } = require('../models/users');
+const { User, validateUpdateUser } = require('../Models/users');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const { cloudinaryUploadImage, cloudinaryDeleteImage}= require('../utils/cloudinary');

@@ -9,14 +9,14 @@ const postSchema = new mongoose.Schema({
         minlength: 2,
         maxlength: 200,
     },
-    description: {
+    description : {
         type: String,
         required: true,
         trim: true,
         minlength: 2,
         maxlength: 200,
     },
-    use : {
+    user : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
@@ -45,7 +45,7 @@ const postSchema = new mongoose.Schema({
 );
 
 // post model
-const postModel = mongoose.model("Post", postSchema);
+const Post = mongoose.model("Post", postSchema);
 
 //validate create post
 function validatePost(post) {
@@ -69,7 +69,7 @@ function validateUpdatePost(post) {
 
 
 module.exports = {
-    postModel,
+    Post,
     validatePost,
     validateUpdatePost,
 };
