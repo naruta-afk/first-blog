@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const asyncHandler = require('express-async-handler');
 const { Post , validatePost} = require('../Models/post');
-const { cloudinaryUploadImage}= require('../utils/cloudinary');
+const { cloudinaryUploadImage, cloudinaryDeleteImage}= require('../utils/cloudinary');
 
 // create new post
 const createPostCtrl = asyncHandler(async (req, res) => {
@@ -62,7 +62,28 @@ const getPostCountCtrl = asyncHandler(async (req, res) => {
   const postCount = await Post.countDocuments();
   res.status(200).json(postCount);
 });
+//delete post
+const deletePostCtrl = asyncHandler(async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if(!post){ 
+    return res.status(404).json({message:"Post not found"});
+  }
+   if(req.user.isAdmin || req.user.id === post.user.toString()){
+     await Post.findByIdAndDelete(req.params.id);
+     await cloudinaryDeleteImage(post.image.public_id);
+     res.status(200).json({message:"Post deleted successfully",postId : post._id});
+   }else{
+     return res.status(403 ).json({message:"You are not authorized to delete this post"});
+   }
+});
 
-module.exports = {createPostCtrl, getAllPostsCtrl, getPostCtrl, getPostCountCtrl};
+
+
+module.exports = {
+  createPostCtrl,
+   getAllPostsCtrl, 
+   getPostCtrl,
+   deletePostCtrl,
+   getPostCountCtrl};
 
 
