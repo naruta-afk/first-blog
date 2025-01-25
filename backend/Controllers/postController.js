@@ -84,7 +84,7 @@ const deletePostCtrl = asyncHandler(async (req, res) => {
 
 
 // update post
-const updatePostCtrl = asyncHandler(async (req, res) => {
+ exports.updatePostCtrl = asyncHandler(async (req, res) => {
   const {error }= validateUpdatePost(req.body);
   if(error){
     return res.status(400).json({message:error.details[0].message});
@@ -115,7 +115,6 @@ module.exports = {
    getAllPostsCtrl, 
    getPostCtrl,
    deletePostCtrl,
-   updatePostCtrl,
    getPostCountCtrl}
  
 
