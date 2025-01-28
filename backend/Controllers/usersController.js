@@ -11,7 +11,7 @@ const fs = require('fs');
  * @access Public
  */
 const getAllUsersCtrl = asyncHandler(async (req, res) => {
-  const users = await User.find().select('-password');
+  const users = await User.find().select('-password').populate('posts');
   res.json(users);
 });
 
@@ -21,7 +21,7 @@ const getAllUsersCtrl = asyncHandler(async (req, res) => {
  * @access Public
  */
 const getUserCtrl = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password');
+  const user = await User.findById(req.params.id).select('-password').populate('posts');
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
   }

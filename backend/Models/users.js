@@ -47,7 +47,17 @@ const userSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
-},{timestamps: true}); 
+},{timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+}); 
+
+// populate the user posts
+userSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'user',
+});
 
 
 //generate the token(JWT)
