@@ -84,7 +84,7 @@ const deletePostCtrl = asyncHandler(async (req, res) => {
 
 
 // update post
- exports.updatePostCtrl = asyncHandler(async (req, res) => {
+ const updatePostCtrl = asyncHandler(async (req, res) => {
   const {error }= validateUpdatePost(req.body);
   if(error){
     return res.status(400).json({message:error.details[0].message});
@@ -108,13 +108,43 @@ const deletePostCtrl = asyncHandler(async (req, res) => {
   res.status(200).json(updatedPost);
 
 })
+//update post Image
+const updatePostImageCtrl = asyncHandler(async (req, res) => {
+  if(!req.file){
+    return res.status(400).json({ message: 'No Image uploaded' });
+  }
+  const post = await Post.findById(req.params.id);
+  if(!post){
+    return res.status(404).json({message:"Post not found"});
+  }
+  if(req.user.id !== post.user.toString()){
+    return res.status(403 ).json({message:"You are not authorized to update this post"});
+  }
+  await cloudinaryDeleteImage(post.image.public_id);
+  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+  const result = await cloudinaryUploadImage(imagePath);
+  const updatedPost = await Post.findByIdAndUpdate(req.params.id,{
+    $set : {
+      image : {
+        url : result.secure_url,
+        public_id : result.public_id
+      }
+    }
+  },{new : true}).populate('user',["-password"]);
+  res.status(200).json(updatedPost);
+  fs.unlinkSync(imagePath);
+
+
+})
 
 
 module.exports = {
   createPostCtrl,
    getAllPostsCtrl, 
    getPostCtrl,
+   updatePostCtrl,
    deletePostCtrl,
+   updatePostImageCtrl,
    getPostCountCtrl}
  
 
