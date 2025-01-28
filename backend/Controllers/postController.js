@@ -137,6 +137,30 @@ const updatePostImageCtrl = asyncHandler(async (req, res) => {
 
 })
 
+//Toggling like 
+const toggleLikeCtrl = asyncHandler(async (req, res) => {
+ let post = await Post.findById(req.params.id);
+ if(!post){
+    return res.status(404).json({message:"Post not found"});
+ }
+const isPostLiked = post.likes.find((user)=> user.toString() === req.user.id);
+if(isPostLiked){
+  post = await Post.findByIdAndUpdate(req.params.id,{
+    $pull : {
+      likes : req.user.id
+    }
+  },{new : true});
+}else{
+  post = await Post.findByIdAndUpdate(req.params.id,{
+    $push : {
+      likes : req.user.id
+    }
+  },{new : true});
+}
+res.status(200).json(post);
+
+})
+
 
 module.exports = {
   createPostCtrl,
@@ -145,6 +169,7 @@ module.exports = {
    updatePostCtrl,
    deletePostCtrl,
    updatePostImageCtrl,
+    toggleLikeCtrl,
    getPostCountCtrl}
  
 
