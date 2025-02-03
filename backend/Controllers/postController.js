@@ -3,6 +3,7 @@ const path = require('path');
 const asyncHandler = require('express-async-handler');
 const { Post , validatePost, validateUpdatePost} = require('../Models/post');
 const { cloudinaryUploadImage, cloudinaryDeleteImage}= require('../utils/cloudinary');
+const {Comment}= require ("../Models/comment");
 
 
 
@@ -76,6 +77,10 @@ const deletePostCtrl = asyncHandler(async (req, res) => {
    if(req.user.isAdmin || req.user.id === post.user.toString()){
      await Post.findByIdAndDelete(req.params.id);
      await cloudinaryDeleteImage(post.image.public_id);
+
+      //delete all comments related to the post
+      await Comment.deleteMany({postId : post._id});
+
      res.status(200).json({message:"Post deleted successfully",postId : post._id});
    }else{
      return res.status(403 ).json({message:"You are not authorized to delete this post"});
