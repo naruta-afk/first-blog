@@ -61,3 +61,32 @@ module.exports.deleteComments = asyncHandleer(async(req ,res)=>{
 
 );
 
+
+/**
+ * @desc Update comment
+ * @route PUT /api/comments/:id
+ * @access Private(only the owner of the comment)
+ */
+
+module.exports.updatecomment = asyncHandleer(async (req, res) => {
+    const {error} = validateUpdateComment(req.body);
+
+    if(error) {return res.status(400).json({message:error.details[0].message})};
+ const comment = await Comment.findById(req.params.id);
+    if(!comment){ 
+        return res.status(404).json({message:"Comment not found"})
+    };
+    if(req.user.id !== comment.userId.toString()){
+        return res.status(403).json({message:"You are not authorized to update this comment"});
+    }
+    const updatedComment = await Comment.findByIdAndUpdate(req.params.id,{
+        $set : {
+            text : req.body.text,
+
+        }
+    },{new:true}); 
+    res.status(200).json(updatedComment);
+
+    
+});
+
