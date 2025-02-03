@@ -56,7 +56,7 @@ fs.unlinkSync(imagePath);
 
   // get single post by id
   const getPostCtrl = asyncHandler(async (req, res) => {
-    const post = await Post.findById(req.params.id).populate('user',["-password"]);
+    const post = await Post.findById(req.params.id).populate('user',["-password"]).populate('comments');
     if(!post){ 
       return res.status(404).json({message:"Post not found"});
     }
