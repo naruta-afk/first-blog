@@ -14,6 +14,7 @@ app.use('/api/auth', require('./routes/authRoute'));
 app.use('/api/users', require('./routes/usersRoute'));
 app.use('/api/posts', require('./routes/postRoute'));
 app.use('/api/comments', require('./routes/commentRoute'));
+app.use('/api/categories', require('./routes/categoryRoute'));
 
 
 //running the server
